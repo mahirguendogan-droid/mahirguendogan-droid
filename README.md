@@ -21,10 +21,11 @@
 
 I'm a Software Engineering graduate working at the intersection of **NLP, information retrieval, and applied machine learning**. Most of what I build comes down to one question: *how do you get a machine to understand what something actually means — and then prove that it does?*
 
-That last part matters to me. Every project I ship comes with an evaluation harness: significance tests, baselines to beat, metrics that can embarrass me.
+That second half is the part I care about. Every project below ships with an evaluation harness: a baseline to beat, significance tests, and the metrics that make it look bad reported next to the ones that make it look good. A retrieval number without a stated failure rate isn't a result, it's marketing.
 
-- 🤖 Built **AutoBiasAgent** — an autonomous LLM agent that audits any CSV for statistical and intersectional bias
-- 🔍 Built a **semantic email retrieval engine** (SBERT + FAISS) benchmarked against BM25 — my BAU capstone
+- 🤖 **AutoBiasAgent** — an autonomous LLM agent that audits any CSV for statistical bias · *[live demo](https://huggingface.co/spaces/mahirgundogan/AutoBiasAgent)*
+- 🔍 **Semantic email retrieval** (SBERT + FAISS + hybrid RRF) benchmarked against BM25 — my BAU capstone
+- 🖼️ **CLIP image search** benchmarked on 25 014 human-written COCO captions
 - 📊 Statistics-first: chi-squared, Cramér's V, Precision@K, MRR — not vibes
 - 🗣️ Trilingual: **German** (native) · **English** (C2) · **Turkish** (native)
 - 🎧 Outside the terminal: music production, international politics, sports
@@ -75,29 +76,57 @@ That last part matters to me. Every project I ship comes with an evaluation harn
 ## Featured Projects
 
 ### ⚖️ [AutoBiasAgent](https://github.com/mahirguendogan-droid/bias_agent) · [**▶️ Try it live**](https://huggingface.co/spaces/mahirgundogan/AutoBiasAgent)
+
+[![CI](https://github.com/mahirguendogan-droid/bias_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/mahirguendogan-droid/bias_agent/actions/workflows/ci.yml)
+
 **An autonomous agent that flags biased columns in any CSV — for about $0.0005 a run.**
 
-Upload a dataset, pick a target column, and it runs a four-phase pipeline on its own: per-column distribution analysis with **chi-squared** significance testing, **Cramér's V** chain-of-thought synthesis, intersectional bias assessment across column pairs, and an independent **LLM-as-judge** pass before anything is reported. Findings come out risk-stratified CRITICAL → LOW, with columns in correlated pairs escalated automatically, plus plain-English explanations of *why*.
+Upload a dataset, pick the outcome column, and it decides on its own which columns deserve
+scrutiny. Three phases: per-column distribution analysis with **chi-squared** significance
+testing, **Cramér's V** synthesis that flags biases compounding each other, and plain-English
+explanations of *why* — then an independent **LLM-as-judge** pass over the whole thing. Findings
+come out risk-stratified CRITICAL → LOW, with compounding columns escalated automatically.
 
-`Python` · `GPT-4o-mini` · `SciPy` · `Gradio` — 3–5 LLM calls per full audit, deployed behind a Gradio UI.
+`Python` · `GPT-4o-mini` · `SciPy` · `Gradio` — 3–5 LLM calls per audit. **46 tests** cover the
+statistical layer offline; writing them caught two real defects in the Cramér's V implementation,
+including one where Yates' continuity correction silently understated association on exactly the
+2×2 sensitive-attribute case the tool exists to examine.
 
 ### 🧠 [Semantic Email Retrieval System](https://github.com/mahirguendogan-droid/semantic-email-retrieval)
+
+[![CI](https://github.com/mahirguendogan-droid/semantic-email-retrieval/actions/workflows/ci.yml/badge.svg)](https://github.com/mahirguendogan-droid/semantic-email-retrieval/actions/workflows/ci.yml)
+
 **Email search by meaning, not keyword match.** *BAU capstone — team of 4.*
 
-Sentence-BERT embeddings indexed in **FAISS**, benchmarked over a 500-email corpus with hand-built relevance judgments against a **BM25** keyword baseline. Includes a model comparison mode across MiniLM / MPNet / Paraphrase and a full evaluation harness.
+Sentence-BERT embeddings in **FAISS**, benchmarked over 500 emails and 62 queries against a
+**BM25** baseline. Hybrid **Reciprocal Rank Fusion** wins every aggregate metric — 0.775 MRR
+against 0.715 for pure semantic search and 0.647 for BM25.
 
-`Python` · `Sentence-Transformers` · `FAISS` · `BM25` · `FastAPI` — measured on **Precision@K, Recall@K, MRR** and query latency.
+The per-query-type split is the interesting part: SBERT beats BM25 by **+19.9 MRR points** on
+semantically-phrased queries, while BM25 beats SBERT by **+10.9** on literal keyword queries.
+Neither dominates; fusion is the only method that is never the wrong choice. And fusing a small
+model closes **71% of the gap** to a 3× slower large one.
+
+`Python` · `Sentence-Transformers` · `FAISS` · `BM25` · `FastAPI` — [full results, with stated
+limitations](https://github.com/mahirguendogan-droid/semantic-email-retrieval/blob/main/RESULTS.md).
 
 ### 🖼️ [CLIP Image Search](https://github.com/mahirguendogan-droid/clip-image-search)
+
+[![CI](https://github.com/mahirguendogan-droid/clip-image-search/actions/workflows/ci.yml/badge.svg)](https://github.com/mahirguendogan-droid/clip-image-search/actions/workflows/ci.yml)
+
 **Search 5 000 photographs by describing them — and measure how well it actually works.**
 
 Text and images embedded into one CLIP space, indexed with FAISS, evaluated against 25 014
 human-written COCO captions. Zero-shot **R@1 of 30.5% at a median rank of 2** out of 5 000
-candidates — and 33.8% of captions that never surface their image at all, reported rather than
-hidden behind the averages. Compares three FAISS backends on identical vectors: **HNSW runs
-4.5× faster than exact search while keeping 94.3% of its recall.**
+candidates — and **33.8% of captions that never surface their image at all**, reported next to
+the recall rather than hidden behind it.
+
+Three FAISS backends on identical vectors: **HNSW runs 4.5× faster than exact search while
+keeping 94.3% of its recall** — the trade every vector database makes, measured instead of
+assumed.
 
 `Python` · `CLIP` · `FAISS` · `PyTorch` — plus near-duplicate detection over the same embeddings.
+19 tests run on synthetic vectors, so CI needs no model weights and finishes in under 20 seconds.
 
 ---
 

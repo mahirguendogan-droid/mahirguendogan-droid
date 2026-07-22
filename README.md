@@ -74,7 +74,7 @@ That last part matters to me. Every project I ship comes with an evaluation harn
 
 ## Featured Projects
 
-### ⚖️ [AutoBiasAgent](https://github.com/mahirguendogan-droid/bias_agent)
+### ⚖️ [AutoBiasAgent](https://github.com/mahirguendogan-droid/bias_agent) · [**▶️ Try it live**](https://huggingface.co/spaces/mahirgundogan/AutoBiasAgent)
 **An autonomous agent that flags biased columns in any CSV — for about $0.0005 a run.**
 
 Upload a dataset, pick a target column, and it runs a four-phase pipeline on its own: per-column distribution analysis with **chi-squared** significance testing, **Cramér's V** chain-of-thought synthesis, intersectional bias assessment across column pairs, and an independent **LLM-as-judge** pass before anything is reported. Findings come out risk-stratified CRITICAL → LOW, with columns in correlated pairs escalated automatically, plus plain-English explanations of *why*.

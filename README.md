@@ -88,6 +88,17 @@ Sentence-BERT embeddings indexed in **FAISS**, benchmarked over a 500-email corp
 
 `Python` · `Sentence-Transformers` · `FAISS` · `BM25` · `FastAPI` — measured on **Precision@K, Recall@K, MRR** and query latency.
 
+### 🖼️ [CLIP Image Search](https://github.com/mahirguendogan-droid/clip-image-search)
+**Search 5 000 photographs by describing them — and measure how well it actually works.**
+
+Text and images embedded into one CLIP space, indexed with FAISS, evaluated against 25 014
+human-written COCO captions. Zero-shot **R@1 of 30.5% at a median rank of 2** out of 5 000
+candidates — and 33.8% of captions that never surface their image at all, reported rather than
+hidden behind the averages. Compares three FAISS backends on identical vectors: **HNSW runs
+4.5× faster than exact search while keeping 94.3% of its recall.**
+
+`Python` · `CLIP` · `FAISS` · `PyTorch` — plus near-duplicate detection over the same embeddings.
+
 ---
 
 ## Education
